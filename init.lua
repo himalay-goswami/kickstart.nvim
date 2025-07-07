@@ -244,6 +244,8 @@ rtp:prepend(lazypath)
 --  To update plugins you can run
 --    :Lazy update
 --
+
+
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
@@ -283,6 +285,45 @@ require('lazy').setup({
       },
     },
   },
+  
+  	-- GitHub Copilot plugin
+  	{ "github/copilot.vim", lazy = false },
+  	
+  	-- Autocompletion framework
+	{ "hrsh7th/nvim-cmp" },
+	{ "hrsh7th/cmp-nvim-lsp" },
+
+	-- Snippets (optional)
+	{ "L3MON4D3/LuaSnip" },
+	{ "saadparwaiz1/cmp_luasnip" },
+
+	-- Language server support
+	{ "neovim/nvim-lspconfig" },
+	{ "mfussenegger/nvim-jdtls" },
+
+	-- Treesitter for syntax highlight
+	{ "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
+	
+	 {
+    "mfussenegger/nvim-jdtls",
+    ft = "java",
+    config = function()
+      local jdtls = require("jdtls")
+      local cmp_nvim_lsp = require("cmp_nvim_lsp")
+
+      local home = os.getenv("HOME")
+      local workspace_dir = home .. "/.local/share/eclipse/" .. vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
+
+      local config = {
+        cmd = { "jdtls", "-data", workspace_dir },
+        root_dir = require("jdtls.setup").find_root({ ".git", "pom.xml", "build.gradle" }),
+        capabilities = cmp_nvim_lsp.default_capabilities(),
+      }
+
+      jdtls.start_or_attach(config)
+    end,
+  },
+
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
@@ -1029,6 +1070,20 @@ require('lazy').setup({
       task = '📌',
       lazy = '💤 ',
     },
+  },
+})
+
+local cmp = require("cmp")
+
+cmp.setup({
+  mapping = {
+    ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Press Enter to confirm
+    ['<Tab>'] = cmp.mapping.select_next_item(),
+    ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+  },
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'buffer' },
   },
 })
 
