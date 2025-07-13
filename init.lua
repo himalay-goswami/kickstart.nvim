@@ -940,24 +940,82 @@ require('lazy').setup({
 --  },
 
 {
-  "catppuccin/nvim",
-  name = "catppuccin",
-  priority = 1000,
+    "rebelot/kanagawa.nvim",
+    priority = 1000,
+    config = function()
+      require("kanagawa").setup({
+        compile = false,
+        undercurl = true,
+        commentStyle = { italic = true },
+        functionStyle = {},
+        keywordStyle = { italic = true },
+        statementStyle = { bold = true },
+        typeStyle = {},
+        transparent = false,
+        dimInactive = false,
+        terminalColors = true,
+        theme = "dragon", -- options: wave, dragon, lotus
+      })
+
+      -- Set colorscheme
+      vim.cmd("colorscheme kanagawa-dragon")
+    end,
+  },
+  
+  -- power terminal for neovim
+  {
+  "akinsho/toggleterm.nvim",
+  version = "*",
   config = function()
-    require("catppuccin").setup({
-      flavour = "mocha", -- Options: latte, frappe, macchiato, mocha
-      integrations = {
-        treesitter = true,
-        native_lsp = {
-          enabled = true,
-        },
-        telescope = true,
-        -- Add more integrations as needed
-      }
+    require("toggleterm").setup({
+      open_mapping = [[<c-\>]],
+      direction = "horizontal", -- or "vertical" or "float"
     })
-    vim.cmd.colorscheme "catppuccin"
   end,
 },
+
+-- plugin for git
+{
+  "lewis6991/gitsigns.nvim",
+  event = { "BufReadPre", "BufNewFile" },
+  opts = {
+    signs = {
+      add = { text = "│" },
+      change = { text = "│" },
+      delete = { text = "_" },
+      topdelete = { text = "‾" },
+      changedelete = { text = "~" },
+    },
+    current_line_blame = true,
+  },
+},
+  
+  -- command mode for my neovim. 
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+    },
+    config = function()
+      require("noice").setup({
+        cmdline = {
+          view = "cmdline_popup", -- "cmdline" | "cmdline_popup" | "cmdline_popupmenu"
+        },
+        messages = {
+          enabled = true,
+          view = "notify",
+        },
+        presets = {
+          bottom_search = false,       -- classic bottom search
+          command_palette = true,      -- command-line in center popup
+          long_message_to_split = true,
+          lsp_doc_border = true,
+        },
+      })
+    end,
+  },
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
@@ -1073,6 +1131,7 @@ require('lazy').setup({
   },
 })
 
+-- cmp setup
 local cmp = require("cmp")
 
 cmp.setup({
@@ -1085,7 +1144,16 @@ cmp.setup({
     { name = 'nvim_lsp' },
     { name = 'buffer' },
   },
-})
+})	
+
+-- Keybinding to start Spring Boot
+vim.keymap.set("n", "<leader>sb", function()
+  spring_term:toggle()
+end, { desc = "Run Spring Boot app" })
+
+-- these lines just get rid of all crap like >> | or _ for indent trailing. 
+vim.opt.list = false
+vim.opt.listchars = {}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
